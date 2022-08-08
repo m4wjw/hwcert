@@ -1,0 +1,26 @@
+CREATE OR REPLACE PROCEDURE "OCEAN"."job_plain"("job_id_start" IN VARCHAR(11))
+AUTHID DEFINER
+
+as
+ id_null varchar2(20);
+ id_num varchar2(20);
+ job_info varchar2(100);
+ child_id varchar2(20);
+ id_plain varchar2(50);
+ n_Sql varchar(100);
+begin 
+ set id_num:=job_id_start;
+ set id_plain:='1';
+ set child_id:=job_id_start;
+ set n_Sql := 'truncate   table  ocean.job_plain_tb ';
+ select count(1) into id_null from ocean.xxl_job_info where id=child_id;
+ execute immediate n_Sql ; 
+ if id_null > 0 then
+  while child_id > 0 loop
+   select id,child_jobid,job_desc into id_num,child_id,job_info from ocean.xxl_job_info where id=child_id;
+   insert into ocean.job_plain_tb values (id_plain,id_num,job_info);
+   print(id_plain||' '||id_num||' '||job_info);
+   set id_plain:=id_plain+1;
+  end loop;
+   end if;
+end;
